@@ -4,6 +4,7 @@ import SwiftUI
 struct QuotaDashboardView: View {
     @ObservedObject var quotaStore: QuotaStore
     @ObservedObject var modeStore: DisplayModeStore
+    @ObservedObject var bindingManager: CodexBindingManager
     let actions: AppActions
 
     var body: some View {
@@ -42,6 +43,10 @@ struct QuotaDashboardView: View {
                 .disabled(!quotaStore.canLogoutCloudSession)
             Button("立即刷新", action: actions.onRefresh)
                 .disabled(quotaStore.isLoading)
+            Toggle("绑定 Codex 启动退出", isOn: Binding(
+                get: { bindingManager.isEnabled },
+                set: { _ in actions.onToggleCodexBinding() }
+            ))
             Divider()
             Button("退出软件", action: actions.onQuit)
         }
