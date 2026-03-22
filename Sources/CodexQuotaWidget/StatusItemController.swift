@@ -5,7 +5,6 @@ import SwiftUI
 final class StatusItemController: NSObject, NSPopoverDelegate {
     private let quotaStore: QuotaStore
     private let modeStore: DisplayModeStore
-    private let bindingManager: CodexBindingManager
     private let actions: AppActions
 
     private var statusItem: NSStatusItem?
@@ -17,12 +16,10 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     private let loginItem = NSMenuItem(title: "重新登录 ChatGPT", action: #selector(loginToChatGPT), keyEquivalent: "")
     private let logoutItem = NSMenuItem(title: "退出云端登录", action: #selector(logoutCloudSession), keyEquivalent: "")
     private let refreshItem = NSMenuItem(title: "立即刷新", action: #selector(refreshNow), keyEquivalent: "")
-    private let bindingItem = NSMenuItem(title: "绑定 Codex 启动退出", action: #selector(toggleCodexBinding), keyEquivalent: "")
 
-    init(quotaStore: QuotaStore, modeStore: DisplayModeStore, bindingManager: CodexBindingManager, actions: AppActions) {
+    init(quotaStore: QuotaStore, modeStore: DisplayModeStore, actions: AppActions) {
         self.quotaStore = quotaStore
         self.modeStore = modeStore
-        self.bindingManager = bindingManager
         self.actions = actions
         super.init()
 
@@ -33,7 +30,6 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             rootView: QuotaDashboardView(
                 quotaStore: quotaStore,
                 modeStore: modeStore,
-                bindingManager: bindingManager,
                 actions: actions
             )
         )
@@ -113,11 +109,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         loginItem.target = self
         logoutItem.target = self
         refreshItem.target = self
-        bindingItem.target = self
         menu.addItem(loginItem)
         menu.addItem(logoutItem)
         menu.addItem(refreshItem)
-        menu.addItem(bindingItem)
         menu.addItem(.separator())
 
         let quitItem = NSMenuItem(title: "退出软件", action: #selector(quitApp), keyEquivalent: "")
@@ -145,7 +139,6 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
         statusLineItem.title = quotaStore.statusMenuText
         logoutItem.isEnabled = quotaStore.canLogoutCloudSession
         refreshItem.isEnabled = quotaStore.isLoading == false
-        bindingItem.state = bindingManager.isEnabled ? .on : .off
     }
 
     private func installPopoverDismissMonitors() {
@@ -217,10 +210,5 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
     @objc
     private func refreshNow() {
         actions.onRefresh()
-    }
-
-    @objc
-    private func toggleCodexBinding() {
-        actions.onToggleCodexBinding()
     }
 }

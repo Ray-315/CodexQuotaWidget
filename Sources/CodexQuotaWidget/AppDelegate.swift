@@ -2,7 +2,6 @@ import AppKit
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private let codexBindingManager = CodexBindingManager()
     private let sessionResolver = SessionResolver()
     private lazy var authClient = ChatGPTAuthClient()
     private lazy var loginCoordinator = OAuthLoginCoordinator(authClient: authClient, sessionResolver: sessionResolver)
@@ -26,22 +25,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             onLogin: { [weak self] in self?.quotaStore.beginCloudLogin() },
             onLogout: { [weak self] in self?.quotaStore.logoutCloudSession() },
             onRefresh: { [weak self] in self?.quotaStore.triggerReload() },
-            onToggleCodexBinding: { [weak self] in self?.toggleCodexBinding() },
             onQuit: { NSApp.terminate(nil) }
         )
 
-        statusItemController = StatusItemController(
-            quotaStore: quotaStore,
-            modeStore: modeStore,
-            bindingManager: codexBindingManager,
-            actions: actions
-        )
-        floatingPanelController = FloatingPanelController(
-            quotaStore: quotaStore,
-            modeStore: modeStore,
-            bindingManager: codexBindingManager,
-            actions: actions
-        )
+        statusItemController = StatusItemController(quotaStore: quotaStore, modeStore: modeStore, actions: actions)
+        floatingPanelController = FloatingPanelController(quotaStore: quotaStore, modeStore: modeStore, actions: actions)
 
         quotaStore.onChange = { [weak self] in
             self?.statusItemController?.updateTitle()
@@ -91,23 +79,5 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         statusItemController?.updateTitle()
-    }
-
-    private func toggleCodexBinding() {
-        do {
-            try codexBindingManager.toggle()
-        } catch {
-            codexBindingManager.refreshState()
-            presentBindingError(error)
-        }
-    }
-
-    private func presentBindingError(_ error: Error) {
-        let alert = NSAlert()
-        alert.alertStyle = .warning
-        alert.messageText = "Codex 绑定切换失败"
-        alert.informativeText = error.localizedDescription
-        alert.addButton(withTitle: "知道了")
-        alert.runModal()
     }
 }

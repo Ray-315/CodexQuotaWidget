@@ -18,7 +18,7 @@ CodexQuotaWidget 是一个原生 Swift 小应用，目标很直接：
 
 - 菜单栏、悬浮窗、同时显示三种模式
 - 左键只展示两行额度进度条
-- 右键提供登录、刷新、绑定 Codex 启动退出、退出软件
+- 右键提供登录、刷新、退出软件
 - 云端优先读取 `https://chatgpt.com/backend-api/wham/usage`
 - 自动复用本机 `~/.codex/auth.json`
 - 云端失效时自动回退 `~/.codex/sessions`
@@ -28,7 +28,7 @@ CodexQuotaWidget 是一个原生 Swift 小应用，目标很直接：
 
 - 菜单栏标题：`5h:xx%    7d:xx%`
 - 左键：打开额度面板；点击屏幕任意其他位置会自动收回
-- 右键：打开菜单，切换显示模式、查看当前数据源、重新登录、退出云端登录、立即刷新、绑定 Codex 启动退出、退出软件
+- 右键：打开菜单，切换显示模式、查看当前数据源、重新登录、退出云端登录、立即刷新、退出软件
 - 悬浮窗：显示和左键面板一致的双进度条，并带同样的右键上下文菜单
 
 ## 构建与运行
@@ -90,25 +90,6 @@ open build/CodexQuotaWidget.app
 - `当前数据源：云端`
 - `当前数据源：本地（云端失效）`
 - `当前数据源：本地（未登录）`
-
-## Codex 绑定启动退出
-
-应用内可以开启 `绑定 Codex 启动退出`：
-
-- Codex 启动时，自动拉起 CodexQuotaWidget
-- Codex 退出时，自动关闭 CodexQuotaWidget
-
-实现方式：
-
-- 应用会在 `~/Library/LaunchAgents/local.codex.quota.widget.guardian.plist` 安装一个 LaunchAgent
-- LaunchAgent 运行同一可执行文件的 `--codex-guardian` 模式
-- guardian 专门监听本机 Codex 桌面应用 `com.openai.codex` 的启动和退出事件
-
-注意事项：
-
-- 这个绑定功能必须从 `.app` 启动时才能启用
-- 如果你移动了 `build/CodexQuotaWidget.app` 或其他打包后的 `.app` 位置，需要在应用里先关闭一次绑定，再重新开启一次，让 LaunchAgent 更新路径
-- 如果你手动关闭了小组件，guardian 不会在当前这轮 Codex 会话中立刻强行再拉起；要等下一次 Codex 重新启动时才会再次拉起
 
 ## 已知限制
 

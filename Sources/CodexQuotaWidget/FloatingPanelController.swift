@@ -5,15 +5,13 @@ import SwiftUI
 final class FloatingPanelController {
     private let quotaStore: QuotaStore
     private let modeStore: DisplayModeStore
-    private let bindingManager: CodexBindingManager
     private let actions: AppActions
 
     private var panel: NSPanel?
 
-    init(quotaStore: QuotaStore, modeStore: DisplayModeStore, bindingManager: CodexBindingManager, actions: AppActions) {
+    init(quotaStore: QuotaStore, modeStore: DisplayModeStore, actions: AppActions) {
         self.quotaStore = quotaStore
         self.modeStore = modeStore
-        self.bindingManager = bindingManager
         self.actions = actions
     }
 
@@ -48,12 +46,7 @@ final class FloatingPanelController {
         panel.standardWindowButton(.miniaturizeButton)?.isHidden = true
         panel.standardWindowButton(.zoomButton)?.isHidden = true
 
-        let rootView = QuotaDashboardView(
-            quotaStore: quotaStore,
-            modeStore: modeStore,
-            bindingManager: bindingManager,
-            actions: actions
-        )
+        let rootView = QuotaDashboardView(quotaStore: quotaStore, modeStore: modeStore, actions: actions)
         panel.contentView = NSHostingView(rootView: rootView)
 
         self.panel = panel
